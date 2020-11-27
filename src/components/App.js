@@ -40,7 +40,7 @@ const App = () => {
   const [selected, setSelected] = useState(options[0]);
 
   return (
-    <div>
+    <div className="ui container">
       <Header />
       <Route path="/">
         <Accordion items={items} />
