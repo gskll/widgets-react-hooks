@@ -1,7 +1,31 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useRef } from "react";
 
 const Dropdown = ({ options, selected, onSelectedChange, label }) => {
   const [open, setOpen] = useState(false);
+  const ref = useRef();
+
+  // FIX dropdown not closing when click outside of dropdown
+  // attach event listener to body to take advantage of event bubbling
+  //    sets open to false
+  //    detect click in / out the dropdown with useRef
+  //    return early if current ref contains click target
+  // cleanup: remove body-wide event listener
+  const onBodyClick = (event) => {
+    if (ref.current && ref.current.contains(event.target)) {
+      return;
+    }
+    setOpen(false);
+  };
+
+  useEffect(() => {
+    document.body.addEventListener("click", onBodyClick, { capture: true });
+
+    return () => {
+      document.body.removeEventListener("click", onBodyClick, {
+        capture: true,
+      });
+    };
+  }, []);
 
   const renderedOptions = options.map((option) => {
     if (option.value === selected.value) {
@@ -20,7 +44,7 @@ const Dropdown = ({ options, selected, onSelectedChange, label }) => {
   });
 
   return (
-    <div className="ui form">
+    <div ref={ref} className="ui form">
       <div className="field">
         <label className="label">{label}</label>
         <div
